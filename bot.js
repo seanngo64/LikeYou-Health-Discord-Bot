@@ -84,7 +84,7 @@ client.on("messageCreate", async (msg) => {
 			model: "gpt-5-mini",
 			input: msg.content,
 			reasoning: { effort: "minimal" },
-			text: { verbosity: "low" },
+			text: { verbosity: "low" }
 			// tool_choice: {
 			// 	"type": "custom",
 			// 	"mode": "auto",
@@ -92,9 +92,8 @@ client.on("messageCreate", async (msg) => {
 			// 		{ type: "function", name: "get-weather", description: "Tells today's weather." }
 			// 	]
 			// },
-			max_output_tokens: 100
 		});
-		msg.reply(response.output_text)
+		msg.channel.send(response.output_text)
 	}
 })
 
