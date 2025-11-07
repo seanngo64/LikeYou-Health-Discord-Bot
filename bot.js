@@ -48,7 +48,7 @@ client.on("messageCreate", async (msg) => {
 			text: { verbosity: "low" },
 			max_output_tokens: 100
 		});
-		msg.reply(response.output_text)
+		msg.channel.send(response.output_text)
 	}
 })
 
