@@ -39,25 +39,36 @@ client.once(Events.ClientReady, async (readyClient) => {
 });
 
 var messages = []
+var system_messages = []
 
 var cur_ai_user = ""
 
 // Note that === is a js notation for type checking
 client.on("messageCreate", async (msg) => {
 	let myDict = {} // handles message content in dictionary
-	myDict.author = msg.author.globalName
+	myDict.author = msg.author.globalName // TODO: is this how u push to a dict???
 	myDict.content = msg.content
-	messages.push(
-		myDict
-	)
+	if (!msg.author.globalName === "system")  {
+		messages.push(
+			myDict
+		)
+	}
 
 	if (msg.author.bot) return; // makes sure it can't reply to itself
 
 	if (msg.author.globalName === cur_ai_user)	{ // allows talking to AI
 		msg.react("🔄")
-		msg.channel.send(await runAI("Here is the conversation log: " + JSON.stringify(messages) + 
-			" ||| Given the conversation, respond to the following: " + msg.content))
-		await msg.reactions.cache.get("🔄").users.remove(config["client-id"])
+    	const waitingMsg = await msg.reply("⏳ Waiting for AI response...");
+
+		// Make the AI call
+		const aiResponse = await runAI("Here is the conversation log: " + JSON.stringify(messages) + 
+        	" ||| Given the conversation, respond to the following: " + msg.content);
+
+		// Edit the waiting message with the AI response
+		await waitingMsg.edit(aiResponse);
+		myDict.content = aiResponse; // TODO: can work? also add await
+		
+    	await msg.reactions.cache.get("🔄").users.remove(config["client-id"])
 	}
 
 	if (msg.content.includes("pin me"))	{ // pins the message
@@ -111,7 +122,6 @@ client.on("interactionCreate", async (interaction) => {
 		} else {
 			await interaction.deferReply()
 			var response = await runAI("Summarize the following messages: " + JSON.stringify(messages))
-			response = response
 			await interaction.editReply(response)
 		}
 	}
