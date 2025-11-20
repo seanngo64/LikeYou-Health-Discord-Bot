@@ -66,7 +66,11 @@ client.on("messageCreate", async (msg) => {
 
 		// Edit the waiting message with the AI response
 		await waitingMsg.edit(aiResponse);
-		myDict.content = aiResponse; // TODO: can work? also add await
+		myDict.author = "system"
+		myDict.content = await aiResponse; // TODO: can work? also add await
+		system_messages.push(
+			myDict
+		)
 		
     	await msg.reactions.cache.get("🔄").users.remove(config["client-id"])
 	}
